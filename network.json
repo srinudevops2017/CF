@@ -1,0 +1,150 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Complex Network",
+	"Parameters": {
+
+		"vpcccidrblock": {
+			"Description": "CR Block for vpc",
+			"Type": "String",
+			"Default": "10.0.0.0/16"
+		},
+
+		"subnet1cidr": {
+			"Description": "CR Block for subnet1",
+			"Type": "String",
+			"Default": "10.0.0.0/24"
+		},
+
+		"subnet2cidr": {
+			"Description": "CR Block for subnet2",
+			"Type": "String",
+			"Default": "10.0.1.0/24"
+		},
+
+		"subnet3cidr": {
+			"Description": "CR Block for subnet3",
+			"Type": "String",
+			"Default": "10.0.2.0/24"
+		},
+
+		"subnet4cidr": {
+			"Description": "CR Block for subnet4",
+			"Type": "String",
+			"Default": "10.0.3.0/24"
+        },
+        "subnet1az": {
+            "Description": "az pf subnet1",
+            "Type":"AWS::EC2::AvailabilityZone::Name"
+        
+        },
+        "subnet2az": {
+            "Description": "az pf subnet1",
+            "Type":"AWS::EC2::AvailabilityZone::Name"
+    
+        },
+        "subnet3az": {
+            "Description": "az pf subnet1",
+            "Type":"AWS::EC2::AvailabilityZone::Name"
+
+        },
+        "subnet4az": {
+            "Description": "az pf subnet1",
+            "Type":"AWS::EC2::AvailabilityZone::Name"
+
+        }
+    }, 
+		"Resources": {
+			"myvpc": {
+				"Type": "AWS::EC2::VPC",
+				"Properties": {
+					"CidrBlock": {"Ref":"vpcccidrblock"}
+				}
+			},
+
+
+			"subnet1": {
+				"Type": "AWS::EC2::Subnet",
+				"Properties": {
+					"AvailabilityZone":{ "Ref": "subnet1az" },
+					"VpcId": {
+						"Ref": "myvpc"
+					},
+					"CidrBlock": {
+						"Ref": "subnet1cidr"
+					}
+				}
+			},
+
+			"subnet2": {
+				"Type": "AWS::EC2::Subnet",
+				"Properties": {
+					"AvailabilityZone": { "Ref": "subnet2az"},
+					"VpcId": {
+						"Ref": "myvpc"
+					},
+					"CidrBlock": {
+						"Ref": "subnet2cidr"
+					}
+				}
+			},
+
+			"subnet3": {
+				"Type": "AWS::EC2::Subnet",
+				"Properties": {
+					"AvailabilityZone": { "Ref": "subnet3az" },
+					"VpcId": {
+						"Ref": "myvpc"
+					},
+					"CidrBlock": {
+						"Ref": "subnet3cidr"
+					}
+				}
+			},
+
+			"subnet4": {
+				"Type": "AWS::EC2::Subnet",
+				"Properties": {
+					"AvailabilityZone": { "Ref": "subnet4az" },
+					"VpcId": {
+						"Ref": "myvpc"
+					},
+					"CidrBlock": {
+						"Ref": "subnet4cidr"
+					}
+				}
+			},
+
+			"mysecuritygroup": {
+				"Type": "AWS::EC2::SecurityGroup",
+				"Properties": {
+					"GroupName": "AllowSSH",
+					"GroupDescription": "This group for allow ssh",
+					"VpcId": {"Ref": "myvpc"},
+                    "SecurityGroupIngress":[{
+                        "IpProtocol":"tcp",
+                        "FromPort":22,
+                        "ToPort":22,
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol":"tcp",
+                        "FromPort":80,
+                        "ToPort":80,
+                        "CidrIp": "0.0.0.0/0"
+                    }]
+				}
+            },
+            
+            "myec2": {
+                "Type": "AWS::EC2::Instance",
+                "Properties": {
+                    "KeyName": "cf",
+                    "ImageId": "ami-0cb0e70f44e1a4bb5",
+                    "InstanceType": "t2.micro",
+                    "SecurityGroupIds" : [{"Ref":"mysecuritygroup"}],
+                    "SubnetId":{"Ref":"subnet1"}
+                   }
+                    
+            }
+		}
+}
